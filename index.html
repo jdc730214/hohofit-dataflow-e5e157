@@ -194,6 +194,11 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
 .lightbox.open{display:flex}
 .lightbox img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .backdrop{display:none}
+.mtools{display:none;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.mtools .seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;box-shadow:var(--shadow)}
+.mtools button{border:0;background:none;border-radius:8px;padding:6px 12px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer}
+.mtools button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.mtools .hint{flex-basis:100%;font-size:12.5px;color:var(--muted)}
 
 /* ── 響應式 ── */
 @media (max-width:1280px){
@@ -207,13 +212,18 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
   .ref{grid-template-columns:1fr}
 }
 @media (max-width:900px){
-  .mapwrap{overflow:visible;background:none;border:0;box-shadow:none}
-  .map{min-width:0;grid-template-columns:1fr;row-gap:22px;padding:0}
-  .map svg.edges,.map svg.labels,.legend{display:none}
-  .lane{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
-  .dbwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-  .adm .card{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}
-  .adm .thumb{height:80px;margin:0}
+  .mtools{display:flex}
+  body.mapmode .mapwrap{overflow:auto;-webkit-overflow-scrolling:touch}
+  body.mapmode .map{width:1000px;min-width:1000px}
+  body.mapmode .legend{padding-left:14px}
+  body.listmode .zoom{display:none}
+  body.listmode .mapwrap{overflow:visible;background:none;border:0;box-shadow:none}
+  body.listmode .map{min-width:0;grid-template-columns:1fr;row-gap:22px;padding:0}
+  body.listmode .map svg.edges,body.listmode .map svg.labels,body.listmode .legend{display:none}
+  body.listmode .lane{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+  body.listmode .dbwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  body.listmode .adm .card{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}
+  body.listmode .adm .thumb{height:80px;margin:0}
   aside.panel{top:auto;left:0;width:100%;height:86vh;border-radius:20px 20px 0 0;transform:translateY(105%)}
   .pclose{justify-content:center;padding-top:8px}
   .pclose::before{content:"";position:absolute;top:6px;left:50%;width:44px;height:4px;margin-left:-22px;border-radius:2px;background:var(--line)}
@@ -225,8 +235,8 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
   td{border:0;padding:1px 0} td:first-child,td:nth-child(2){display:inline} td:nth-child(2){margin-left:8px}
 }
 @media (max-width:480px){
-  .adm .card{grid-template-columns:1fr}
-  .adm .thumb{height:110px}
+  body.listmode .adm .card{grid-template-columns:1fr}
+  body.listmode .adm .thumb{height:110px}
   .stat b{font-size:19px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -248,11 +258,17 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
 <nav class="flow" aria-label="依流程查看"><div class="wrap" id="steps"></div></nav>
 
 <div class="wrap layout">
+  <div class="mtools" id="mtools">
+    <div class="seg" role="group" aria-label="顯示方式"><button type="button" data-view="map">關係圖</button><button type="button" data-view="list">清單</button></div>
+    <div class="seg zoom" role="group" aria-label="縮放"><button type="button" data-zoom-level="fit">全圖</button><button type="button" data-zoom-level="mid">中</button><button type="button" data-zoom-level="full">原尺寸</button></div>
+    <span class="hint" id="mhint">點任一項目會亮出連線並從下方顯示說明；看不清楚時切到「中」或「原尺寸」左右滑動。</span>
+  </div>
   <div class="mapwrap">
     <div class="legend" aria-label="連線圖例">
       <span><i class="sw set"></i>後台寫入</span><span><i class="sw fetch"></i>App 向雲端讀取</span>
       <span><i class="sw up"></i>App 上傳</span><span><i class="sw intra"></i>App 內部計算</span><span><i class="sw read"></i>後台讀取顯示</span>
     </div>
+    <div id="sizer"><div id="mapscale">
     <div class="map" id="map">
       <svg class="edges" id="edges" aria-hidden="true"></svg>
       <svg class="labels" id="labels" aria-hidden="true"></svg>
@@ -260,6 +276,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
       <div class="lane db" id="lane-db"><div class="lanehead"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><div><b>雲端資料</b><small>App 與後台都經過這裡交換</small></div></div></div>
       <div class="lane adm" id="lane-adm"><div class="lanehead"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span><div><b>後台（醫療端）</b><small>輸入設定與查看紀錄</small></div></div></div>
     </div>
+    </div></div>
   </div>
   <aside class="panel" id="panel" aria-live="polite"><div class="pclose"><button type="button" id="pclose" aria-label="關閉說明">×</button></div><div class="pin" id="pin"></div></aside>
 </div>
@@ -566,9 +583,35 @@ for (const [a,b,type,label] of EDGES){
 function box(id){
   // x 取所屬卡片的左右邊緣（連線不穿過卡片），y 取項目本身的中心
   const n=NODE[id], r=n.el.getBoundingClientRect(), c=(n.card?NODE[n.card].el:n.el).getBoundingClientRect(), m=map.getBoundingClientRect();
-  return {l:c.left-m.left,r:c.right-m.left,cy:(r.top+r.bottom)/2-m.top};
+  return {l:(c.left-m.left)/S,r:(c.right-m.left)/S,cy:((r.top+r.bottom)/2-m.top)/S};
 }
-const narrow=()=>window.matchMedia("(max-width:900px)").matches;
+const isNarrow=()=>window.matchMedia("(max-width:900px)").matches;
+let viewMode="map", zoomLevel="fit", S=1;
+const narrow=()=>isNarrow()&&viewMode==="list";   // 清單模式：不畫連線
+function applyView(){
+  const mapMode=isNarrow()&&viewMode==="map";
+  document.body.classList.toggle("listmode",isNarrow()&&viewMode==="list");
+  document.body.classList.toggle("mapmode",mapMode);
+  const ms=document.getElementById("mapscale"), sz=document.getElementById("sizer");
+  if(mapMode){
+    const avail=document.querySelector(".mapwrap").clientWidth, mw=map.offsetWidth, mh=map.offsetHeight;
+    S = zoomLevel==="fit" ? Math.min(1,avail/mw) : zoomLevel==="mid" ? 0.62 : 1;
+    ms.style.transform=`scale(${S})`; ms.style.transformOrigin="0 0"; ms.style.width=mw+"px";
+    sz.style.width=(mw*S)+"px"; sz.style.height=(mh*S)+"px"; sz.style.overflow="hidden";
+  }else{
+    S=1; ms.style.transform=""; ms.style.width=""; sz.style.width=""; sz.style.height=""; sz.style.overflow="";
+  }
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===viewMode)));
+  document.querySelectorAll("[data-zoom-level]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.zoomLevel===zoomLevel)));
+  document.getElementById("mhint").textContent = viewMode==="map"
+    ? "點任一項目會亮出連線並從下方顯示說明；看不清楚時切到「中」或「原尺寸」左右滑動。"
+    : "清單模式不畫連線；點任一項目，下方說明會列出「從哪裡來」與「用在哪裡」。";
+  layout();
+}
+document.getElementById("mtools").addEventListener("click",ev=>{
+  const v=ev.target.closest("[data-view]"); if(v){viewMode=v.dataset.view; applyView(); return;}
+  const z=ev.target.closest("[data-zoom-level]"); if(z){zoomLevel=z.dataset.zoomLevel; applyView();}
+});
 function layout(){
   if(narrow()) return;
   for(const g of [svg,lsvg]){g.setAttribute("width",map.scrollWidth); g.setAttribute("height",map.scrollHeight);}
@@ -739,11 +782,11 @@ for(const id of ["db_rest","v_rhr","v_nlfhf"]){ ic++; const li=document.createEl
 document.getElementById("issueCount").textContent=ic;
 issueList.addEventListener("click",ev=>{const g=ev.target.closest("[data-go]"); if(g){select(g.dataset.go); if(!narrow()) window.scrollTo({top:0,behavior:"smooth"});}});
 
-renderIntro(); setStepPressed(-1); layout();
-window.addEventListener("resize",layout);
-if(document.fonts&&document.fonts.ready) document.fonts.ready.then(layout);
-new ResizeObserver(layout).observe(map);
-window.addEventListener("load",layout);
+renderIntro(); setStepPressed(-1); applyView();
+window.addEventListener("resize",applyView);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(applyView);
+new ResizeObserver(()=>applyView()).observe(map);
+window.addEventListener("load",applyView);
 </script>
 </body>
 </html>
