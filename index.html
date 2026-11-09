@@ -35,6 +35,7 @@
   --warn:#f5b04a; --warn-soft:#3a2b12; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark;}
 *{box-sizing:border-box}
 html,body{margin:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--adm);outline-offset:2px;border-radius:6px}
@@ -194,6 +195,9 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
 .lightbox.open{display:flex}
 .lightbox img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .backdrop{display:none}
+body.mapmode .mapwrap{overflow:auto;-webkit-overflow-scrolling:touch}
+body.mapmode .map{width:1000px;min-width:1000px}
+body.mapmode .legend{padding-left:14px}
 .mtools{display:none;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
 .mtools .seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;box-shadow:var(--shadow)}
 .mtools button{border:0;background:none;border-radius:8px;padding:6px 12px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer}
@@ -213,9 +217,6 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
 }
 @media (max-width:900px){
   .mtools{display:flex}
-  body.mapmode .mapwrap{overflow:auto;-webkit-overflow-scrolling:touch}
-  body.mapmode .map{width:1000px;min-width:1000px}
-  body.mapmode .legend{padding-left:14px}
   body.listmode .zoom{display:none}
   body.listmode .mapwrap{overflow:visible;background:none;border:0;box-shadow:none}
   body.listmode .map{min-width:0;grid-template-columns:1fr;row-gap:22px;padding:0}
@@ -251,21 +252,31 @@ html.is-phone .pclose::before{display:none}
 html.is-phone body{padding-bottom:0}
 html.is-phone .mtools .seg:first-child{display:none}
 html.is-phone .mtools .hint{display:none}
+html.is-phone .mtools{display:flex}
+html.is-phone header{padding-top:12px;padding-bottom:6px}
+html.is-phone h1{font-size:20px}
+html.is-phone .lede{font-size:12.5px}
+html.is-phone .stat{padding:4px 10px} html.is-phone .stat b{font-size:16px} html.is-phone .stat span{font-size:11.5px}
+html.is-phone .flow .wrap{padding-top:6px;padding-bottom:6px}
+html.is-phone .flow button{font-size:12px;padding:3px 10px 3px 3px} html.is-phone .flow button .n{width:20px;height:20px;font-size:11px}
+html.is-phone .flow .all{padding:3px 10px}
+html.is-phone .mtools button{font-size:12px;padding:4px 10px}
+html.is-phone aside.panel{width:min(340px,44%)}
 /* 手機說明面板精簡：截圖縮小靠左、文字排旁邊 */
 html.is-phone .pclose{position:absolute;top:6px;right:6px;padding:0;background:none}
 html.is-phone .pclose button{width:30px;height:30px;font-size:18px}
-html.is-phone .pin{padding:12px 14px 16px;font-size:13px;line-height:1.55}
+html.is-phone .pin{padding:10px 12px 14px;font-size:12.5px;line-height:1.5}
 html.is-phone .kind{font-size:11px;padding:1px 6px}
-html.is-phone .panel h2{font-size:17px;margin:4px 34px 0 0}
+html.is-phone .panel h2{font-size:15px;margin:3px 34px 0 0}
 html.is-phone .panel .parent{font-size:12px}
-html.is-phone .panel p,html.is-phone .panel li,html.is-phone .rel li{font-size:13px;line-height:1.55}
+html.is-phone .panel p,html.is-phone .panel li,html.is-phone .rel li{font-size:12.5px;line-height:1.5}
 html.is-phone .panel h3{margin-top:10px;font-size:11.5px}
-html.is-phone .issue{font-size:12.5px;padding:6px 9px;margin-top:8px}
+html.is-phone .issue{font-size:12px;padding:6px 9px;margin-top:8px}
 html.is-phone .f{font-size:11.5px;padding:6px 8px}
 html.is-phone .shot{display:flow-root;margin:8px 0 2px}
 html.is-phone .shot>button{float:left;margin:0 10px 4px 0}
-html.is-phone .shot .phone{width:84px;border-width:3px;border-radius:12px;margin:0;box-shadow:none}
-html.is-phone .shot>button:has(.browser),html.is-phone .shot>button:has(.wide){width:46%}
+html.is-phone .shot .phone{width:64px;border-width:3px;border-radius:12px;margin:0;box-shadow:none}
+html.is-phone .shot>button:has(.browser),html.is-phone .shot>button:has(.wide){width:42%}
 html.is-phone .shot .browser,html.is-phone .shot .wide{width:100%;margin:0}
 html.is-phone .shot.noloc>button,html.is-phone .shot.noloc figcaption{display:none}
 html.is-phone .shot .browser .bar{padding:4px 6px}
@@ -644,8 +655,9 @@ const isNarrow=()=>window.matchMedia("(max-width:900px)").matches;
 let viewMode="map", zoomLevel="fit", S=1;  // 手機一律關係圖模式
 const narrow=()=>isNarrow()&&viewMode==="list";   // 清單模式：不畫連線
 function applyView(){
-  const mapMode=isNarrow()&&viewMode==="map";
-  document.body.classList.toggle("listmode",isNarrow()&&viewMode==="list");
+  const small=isNarrow()||isPhone();
+  const mapMode=small&&viewMode==="map";
+  document.body.classList.toggle("listmode",small&&viewMode==="list");
   document.body.classList.toggle("mapmode",mapMode);
   const ms=document.getElementById("mapscale"), sz=document.getElementById("sizer");
   if(mapMode){
