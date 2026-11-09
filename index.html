@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>禾青心訓資料關聯圖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 版面：三欄心智圖（App｜雲端｜後台），連線在欄間；寬螢幕右側固定說明面板，窄螢幕改抽屜 */
+  --bg:#f3f5fa; --surface:#ffffff; --ink:#151b2c; --muted:#5f6b82; --line:#e1e6ef;
+  --app:#7c3aed; --app-soft:#f2ecfe; --app-ink:#5b21b6;
+  --db:#0f8a7e; --db-soft:#e3f5f2; --db-ink:#0b5f57;
+  --adm:#2563eb; --adm-soft:#e8effe; --adm-ink:#1d4ed8;
+  --warn:#b45309; --warn-soft:#fff3df;
+  --shadow:0 1px 2px rgba(20,27,44,.06),0 6px 18px rgba(20,27,44,.06);
+  --f-body:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c1120; --surface:#141b2d; --ink:#e8ecf4; --muted:#97a2b8; --line:#253048;
+  --app:#a78bfa; --app-soft:#251d40; --app-ink:#c4b5fd;
+  --db:#2dd4bf; --db-soft:#11302f; --db-ink:#5eead4;
+  --adm:#60a5fa; --adm-soft:#16264a; --adm-ink:#93c5fd;
+  --warn:#f5b04a; --warn-soft:#3a2b12; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0c1120; --surface:#141b2d; --ink:#e8ecf4; --muted:#97a2b8; --line:#253048;
+  --app:#a78bfa; --app-soft:#251d40; --app-ink:#c4b5fd;
+  --db:#2dd4bf; --db-soft:#11302f; --db-ink:#5eead4;
+  --adm:#60a5fa; --adm-soft:#16264a; --adm-ink:#93c5fd;
+  --warn:#f5b04a; --warn-soft:#3a2b12; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--adm);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1560px;margin:0 auto;padding:0 clamp(14px,2.4vw,28px)}
+
+/* ── 頁首 ── */
+header{padding:28px 0 14px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.08em}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--app);box-shadow:12px 0 0 var(--db),24px 0 0 var(--adm);margin-right:26px}
+h1{font-size:clamp(24px,3.2vw,34px);font-weight:900;margin:6px 0 6px;letter-spacing:.01em;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:68ch}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.stat{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 14px;box-shadow:var(--shadow)}
+.stat b{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
+.stat span{font-size:13px;color:var(--muted);line-height:1.3}
+.stat.app b{color:var(--app)} .stat.db b{color:var(--db)} .stat.adm b{color:var(--adm)} .stat.warn b{color:var(--warn)}
+
+/* ── 流程時間軸 ── */
+.flow{position:sticky;top:0;z-index:6;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-bottom:16px}
+.flow .wrap{display:flex;align-items:center;gap:6px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:thin}
+.flow button{flex:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px 6px 6px;cursor:pointer;font-size:14px;font-weight:500;white-space:nowrap;transition:background .15s,border-color .15s}
+.flow button .n{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--bg);font-size:12.5px;font-weight:700;color:var(--muted)}
+.flow button:hover{border-color:var(--muted)}
+.flow button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.flow button[aria-pressed="true"] .n{background:var(--bg);color:var(--ink)}
+.flow .sep{flex:none;width:14px;height:2px;background:var(--line);border-radius:2px}
+.flow .all{padding:6px 14px}
+
+/* ── 主版面 ── */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start;padding-bottom:28px}
+.mapwrap{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow-x:auto}
+.map{position:relative;min-width:980px;display:grid;grid-template-columns:minmax(280px,1fr) minmax(178px,.6fr) minmax(280px,1fr);column-gap:80px;padding:18px 18px 24px 118px}
+.map svg.edges,.map svg.labels{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.map svg.labels{z-index:3}
+.lane{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;min-width:0}
+.lanehead{display:flex;align-items:center;gap:10px;padding:2px 0 10px;margin-bottom:2px;border-bottom:2px solid var(--line)}
+.lanehead .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
+.lanehead .ic svg{width:19px;height:19px}
+.lanehead b{display:block;font-size:15px;line-height:1.2}
+.lanehead small{display:block;font-size:12px;color:var(--muted);line-height:1.3}
+.app .ic{background:var(--app-soft);color:var(--app)} .db .ic{background:var(--db-soft);color:var(--db)} .adm .ic{background:var(--adm-soft);color:var(--adm)}
+.app .lanehead{border-color:var(--app)} .db .lanehead{border-color:var(--db)} .adm .lanehead{border-color:var(--adm)}
+.dbwrap{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:14px}
+
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;transition:opacity .2s,box-shadow .2s,border-color .2s}
+.card:hover{box-shadow:var(--shadow)}
+.app .card{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:start}
+.thumb{all:unset;cursor:pointer;display:block;overflow:hidden;background:#0d0f1c;border-radius:9px}
+.thumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:top center}
+.app .thumb{width:52px;height:106px;border:2px solid #252a3d;border-radius:11px}
+.adm .thumb{width:100%;height:96px;margin-bottom:9px;border:1px solid var(--line);background:#fff}
+.adm .thumb img{object-position:top left}
+.card .title{all:unset;cursor:pointer;display:block;font-weight:700;font-size:15px;line-height:1.35}
+.card .desc{font-size:12.5px;color:var(--muted);margin:2px 0 8px;line-height:1.5}
+.card .step{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;font-size:11.5px;font-weight:700;margin-right:6px;vertical-align:1px}
+.app .step{background:var(--app-soft);color:var(--app-ink)} .adm .step{background:var(--adm-soft);color:var(--adm-ink)}
+.db .card{display:flex;gap:10px;align-items:flex-start;background:var(--db-soft);border-color:color-mix(in srgb,var(--db) 30%,transparent)}
+.db .card .dbi{flex:none;color:var(--db);margin-top:2px}
+.db .card .desc{margin-bottom:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:4px 9px;font-size:13px;line-height:1.35;cursor:pointer;transition:opacity .2s,background .15s,border-color .15s}
+.chip.val::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--app);flex:none}
+.adm .chip.val::before{background:var(--adm)}
+.chip:hover{border-color:var(--muted)}
+.tag{font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:4px;padding:0 5px;line-height:1.6}
+body.sel .card:not(.on)>*{opacity:.25} body.sel .card.on .chip:not(.on){opacity:.3}
+.card>*{transition:opacity .2s}
+.app .chip.on{background:var(--app-soft);border-color:var(--app)}
+.adm .chip.on{background:var(--adm-soft);border-color:var(--adm)}
+.card.focus{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.chip.focus{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+
+.edges path{fill:none;stroke-width:1.4;opacity:.28;transition:opacity .2s,stroke-width .2s}
+.edges path.up,.edges path.intra{stroke:var(--app)} .edges path.intra{stroke-dasharray:2 4}
+.edges path.set,.edges path.read{stroke:var(--adm)} .edges path.read{stroke-dasharray:6 5}
+.edges path.fetch{stroke:var(--db)}
+body.sel .edges path{opacity:.05}
+body.sel .edges path.on{opacity:1;stroke-width:2.4}
+.labels text{font-size:11.5px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:6px;stroke-linejoin:round;display:none}
+body.sel .labels text.on:not(.dup){display:block}
+.mk-up{fill:var(--app)} .mk-set,.mk-read{fill:var(--adm)} .mk-fetch{fill:var(--db)}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:12px 18px 0 118px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:24px;height:0;border-top:2.5px solid}
+.sw.up{border-color:var(--app)} .sw.intra{border-color:var(--app);border-top-style:dotted}
+.sw.set{border-color:var(--adm)} .sw.read{border-color:var(--adm);border-top-style:dashed} .sw.fetch{border-color:var(--db)}
+
+/* ── 說明面板 ── */
+aside.panel{position:sticky;top:70px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);max-height:calc(100vh - 86px);overflow:auto;overscroll-behavior:contain}
+.pin{padding:18px 20px 20px}
+.pclose{display:none}
+.kind{display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px}
+.k-app{color:var(--app-ink);background:var(--app-soft)} .k-db{color:var(--db-ink);background:var(--db-soft)} .k-adm{color:var(--adm-ink);background:var(--adm-soft)}
+.panel h2{font-size:21px;font-weight:900;margin:8px 0 2px;line-height:1.35;text-wrap:balance}
+.panel .parent{font-size:13px;color:var(--muted);margin:0}
+.panel h3{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:16px 0 4px;font-weight:700;letter-spacing:.06em}
+.panel h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.panel p,.panel li{margin:0 0 6px;font-size:14.5px}
+.panel ul{margin:0;padding-left:18px}
+.issue{background:var(--warn-soft);border-left:3px solid var(--warn);padding:9px 12px;border-radius:8px;margin-top:14px;font-size:14px}
+.issue b{color:var(--warn)}
+.f{font-family:var(--f-mono);font-size:12.8px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:block;margin:6px 0 8px;line-height:1.6;white-space:pre-wrap;overflow-x:auto}
+.lnk{all:unset;cursor:pointer;color:var(--adm-ink);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--adm) 40%,transparent);text-underline-offset:3px}
+.lnk:hover{text-decoration-color:currentColor}
+.rel li{font-size:14px}
+.rel .lab{color:var(--muted)}
+.navrow{margin-top:16px;display:flex;gap:18px;flex-wrap:wrap;font-size:14px}
+
+.shot{margin:14px 0 4px}
+.shot button{all:unset;cursor:zoom-in;display:block}
+.shot figcaption{font-size:12.5px;color:var(--muted);margin-top:6px}
+.phone{width:min(230px,62%);margin:0 auto;border:7px solid #1f2233;border-radius:26px;overflow:hidden;background:#0d0f1c;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.phone img{display:block;width:100%}
+.browser{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.browser .bar{display:flex;gap:6px;padding:8px 10px;background:color-mix(in srgb,var(--line) 60%,var(--surface))}
+.browser .bar i{width:9px;height:9px;border-radius:50%;background:#f87171}.browser .bar i:nth-child(2){background:#fbbf24}.browser .bar i:nth-child(3){background:#34d399}
+.browser img{display:block;width:100%}
+.wide img{display:block;width:100%;border-radius:12px}
+.hot{position:relative;display:block;line-height:0}
+.hb{position:absolute;border:2.5px solid #22d3ee;border-radius:6px;box-shadow:0 0 0 3px rgba(34,211,238,.25),0 0 14px rgba(34,211,238,.6);animation:hbpulse 1.1s ease-in-out infinite;pointer-events:none}
+.hb.w{border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.25),0 0 14px rgba(245,158,11,.7)}
+@keyframes hbpulse{0%,100%{opacity:1}50%{opacity:.15}}
+@media (prefers-reduced-motion:reduce){.hb{animation:none}}
+.hotkey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.hotkey i{display:inline-block;width:14px;height:10px;border:2px solid #22d3ee;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.hotkey i.w{border-color:#f59e0b}
+.hotnote{font-size:13px;color:var(--muted);background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:6px 10px;margin-top:8px}
+.issue.top{margin:12px 0 0}
+.issues li .sum{display:block;color:var(--muted);font-size:13px;margin-top:3px;line-height:1.55}
+.fields{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.fields span{font-size:12.5px;background:var(--db-soft);color:var(--db-ink);border-radius:6px;padding:2px 8px}
+
+.introgrid{display:grid;gap:10px;margin-top:12px}
+.introgrid div{display:flex;gap:10px;align-items:flex-start}
+.introgrid .ic{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center}
+.introgrid .ic svg{width:16px;height:16px}
+
+/* ── 下方參考區 ── */
+.ref{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;padding-bottom:36px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px 20px}
+.box h2{font-size:19px;font-weight:900;margin:0 0 12px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;color:var(--muted);font-weight:700}
+td:first-child{font-weight:700;white-space:nowrap}
+td:nth-child(2){white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--app-ink);font-weight:700}
+tr:last-child td{border-bottom:0}
+.tablewrap{overflow-x:auto}
+.issues{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.issues li{border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:10px;padding:8px 12px;font-size:14px}
+.issues li .tag{margin-right:6px}
+footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
+
+/* ── 燈箱 ── */
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(8,10,20,.82);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.backdrop{display:none}
+
+/* ── 響應式 ── */
+@media (max-width:1280px){
+  .layout{grid-template-columns:1fr}
+  aside.panel{position:fixed;top:0;right:0;bottom:0;width:min(440px,94vw);max-height:none;border-radius:18px 0 0 18px;z-index:40;transform:translateX(105%);visibility:hidden;transition:transform .25s ease,visibility 0s linear .25s}
+  body.panel-open aside.panel{transform:none;visibility:visible;transition:transform .25s ease}
+  .pclose{display:flex;position:sticky;top:0;justify-content:flex-end;padding:10px 12px 0;background:var(--surface);z-index:2}
+  .pclose button{all:unset;cursor:pointer;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--bg);font-size:20px}
+  .backdrop{display:block;position:fixed;inset:0;background:rgba(8,10,20,.35);z-index:39;opacity:0;pointer-events:none;transition:opacity .2s}
+  body.panel-open .backdrop{opacity:1;pointer-events:auto}
+  .ref{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .mapwrap{overflow:visible;background:none;border:0;box-shadow:none}
+  .map{min-width:0;grid-template-columns:1fr;row-gap:22px;padding:0}
+  .map svg.edges,.map svg.labels,.legend{display:none}
+  .lane{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+  .dbwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .adm .card{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}
+  .adm .thumb{height:80px;margin:0}
+  aside.panel{top:auto;left:0;width:100%;height:86vh;border-radius:20px 20px 0 0;transform:translateY(105%)}
+  .pclose{justify-content:center;padding-top:8px}
+  .pclose::before{content:"";position:absolute;top:6px;left:50%;width:44px;height:4px;margin-left:-22px;border-radius:2px;background:var(--line)}
+  .pclose button{margin-left:auto}
+}
+@media (max-width:640px){
+  table,tbody,tr,td{display:block} thead{display:none}
+  tr{padding:10px 0;border-bottom:1px solid var(--line)} tr:last-child{border-bottom:0}
+  td{border:0;padding:1px 0} td:first-child,td:nth-child(2){display:inline} td:nth-child(2){margin-left:8px}
+}
+@media (max-width:480px){
+  .adm .card{grid-template-columns:1fr}
+  .adm .thumb{height:110px}
+  .stat b{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <span class="eyebrow"><i></i>禾青心訓・資料怎麼流動</span>
+  <h1>App 與後台資料關聯圖</h1>
+  <p class="lede">點任何一個畫面或數值，會亮出它從哪裡來、存在雲端哪裡、後台哪一頁看得到，右側附實際畫面。上方的流程按鈕可以照「設定、檢測、訓練、查看」的順序一步步看。內容依 2026-11-09 的程式版本整理。</p>
+  <div class="stats">
+    <div class="stat app"><b>6</b><span>App 步驟</span></div>
+    <div class="stat db"><b>5</b><span>雲端資料表</span></div>
+    <div class="stat adm"><b>5</b><span>後台頁面</span></div>
+    <div class="stat warn"><b id="issueCount">0</b><span>待修／待決</span></div>
+  </div>
+</header>
+
+<nav class="flow" aria-label="依流程查看"><div class="wrap" id="steps"></div></nav>
+
+<div class="wrap layout">
+  <div class="mapwrap">
+    <div class="legend" aria-label="連線圖例">
+      <span><i class="sw set"></i>後台寫入</span><span><i class="sw fetch"></i>App 向雲端讀取</span>
+      <span><i class="sw up"></i>App 上傳</span><span><i class="sw intra"></i>App 內部計算</span><span><i class="sw read"></i>後台讀取顯示</span>
+    </div>
+    <div class="map" id="map">
+      <svg class="edges" id="edges" aria-hidden="true"></svg>
+      <svg class="labels" id="labels" aria-hidden="true"></svg>
+      <div class="lane app" id="lane-app"><div class="lanehead"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></span><div><b>受訓者 App</b><small>受訓者看到的畫面與產生的數值</small></div></div></div>
+      <div class="lane db" id="lane-db"><div class="lanehead"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><div><b>雲端資料</b><small>App 與後台都經過這裡交換</small></div></div></div>
+      <div class="lane adm" id="lane-adm"><div class="lanehead"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span><div><b>後台（醫療端）</b><small>輸入設定與查看紀錄</small></div></div></div>
+    </div>
+  </div>
+  <aside class="panel" id="panel" aria-live="polite"><div class="pclose"><button type="button" id="pclose" aria-label="關閉說明">×</button></div><div class="pin" id="pin"></div></aside>
+</div>
+<div class="backdrop" id="backdrop"></div>
+
+<section class="wrap ref">
+  <div class="box">
+    <h2>多久一次：頻率與時間總表</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>項目</th><th>頻率／時間</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td>3 分鐘身體狀態檢測</td><td>每 28 天一輪</td><td>每輪第 1 天是週一。第 1–9 天詢問、第 10–13 天倒數，都可略過；第 14 天起還沒檢測就不能進入心訓。可隨時多量。</td></tr>
+        <tr><td>檢測採計區間</td><td>第 30–180 秒</td><td>前 30 秒不採計。休息心率與 HRV 用同一段。</td></tr>
+        <tr><td>基準心率</td><td>每次訓練前</td><td>近 30 天休息心率紀錄的最低值，滾動計算。</td></tr>
+        <tr><td>訓練區間</td><td>每次訓練前</td><td>每次都向雲端重抓後台設定；離線時沿用上一次。</td></tr>
+        <tr><td>心率帶送值</td><td>約每秒 1 筆</td><td>App 平滑後用於畫面、判定與累計。</td></tr>
+        <tr><td>存檔上傳心率</td><td>每 2 秒 1 筆</td><td>訓練與恢復期都存，結束後一次上傳。</td></tr>
+        <tr><td>區間判定</td><td>連續 10 秒</td><td>越過下限或上限需維持 10 秒才算進出區間。</td></tr>
+        <tr><td>語音播報心率</td><td>每 60 秒</td><td>高於上限改為每 30 秒提醒留意體感。</td></tr>
+        <tr><td>運動後恢復</td><td>最長 10 分鐘</td><td>可提早按完成；最低心率取最後 60 秒。</td></tr>
+        <tr><td>區間回饋問答</td><td>每次訓練結束</td><td>運動超過 10 分鐘，且有效率低於 40% 或高於 80% 才問；答「是」下次生效。</td></tr>
+        <tr><td>週心訓健康點數</td><td>每週一歸零</td><td>台北時間週一 00:00 為界；本週累計 ≥ 100 達標。</td></tr>
+        <tr><td>季訓練報告</td><td>12 週＝84 天</td><td>從第一次訓練那一週的週一起算。</td></tr>
+        <tr><td>生日、性別</td><td>每次進首頁</td><td>背景向雲端更新，後台補填不必重新登入。</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="box">
+    <h2>11/3、11/8 討論中尚未完成</h2>
+    <ul class="issues" id="issueList"></ul>
+  </div>
+</section>
+<footer class="wrap">禾青醫電 HEQING MEDICAL・合作院所討論用文件・截圖中的登入碼、生日、姓名已遮蔽</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="放大檢視"><img id="lbimg" alt=""></div>
+
+<script>
+/* ===== 節點 [lane, id, 標題, 說明, chips[[id, 名稱, 是否為數值, 標籤]]] ===== */
+const CARDS = [
+  ["app","c_home","登入與首頁","院所登入碼登入；首頁顯示基本資料、檢測提醒與本週點數",
+    [["app_login","登入碼登入"],["app_profile","生日・性別"],["app_ppiv","3 分鐘檢測提醒"],["app_week","週心訓健康點數",1]]],
+  ["app","c_rest","3 分鐘身體狀態檢測","坐姿靜止 180 秒，前 30 秒不採計",
+    [["v_rhr","休息心率",1],["v_rmssd","RMSSD",1],["v_sdnn","SDNN",1],["v_nlfhf","nLF／nHF",1]]],
+  ["app","c_zone","訓練前：計算心率區間","按「進入心訓」、連上心率帶後立即計算",
+    [["v_base","基準心率",1],["v_hrmax","最大心率",1],["v_thr","區間下限／上限",1,"待決"]]],
+  ["app","c_train","訓練中","心率平滑後即時顯示、判定區間、累計點數",
+    [["app_trainscreen","訓練畫面心率",0,"待修"],["v_hr","每 2 秒心率",1],["v_zonetime","有效時間",1],["v_points","本次心訓健康點數",1]]],
+  ["app","c_recover","運動後恢復","最長 10 分鐘，可提早按完成",
+    [["v_rechr","恢復期心率",1],["v_recmin","恢復最低心率",1]]],
+  ["app","c_report","結果頁與回饋問答","顯示本次結果；符合條件時問一題",
+    [["app_result","結果頁顯示"],["app_feedback","區間回饋問答"],["v_coef","區間係數",1]]],
+  ["db","db_users","受訓者資料","登入碼、備註、生日、性別、身高、體重",[]],
+  ["db","db_zones","區間設定","下限、上限、最大心率、每週目標、攝氧量",[]],
+  ["db","db_rest","休息心率紀錄","每次檢測一筆：休息心率與 HRV",[]],
+  ["db","db_session","訓練紀錄","每次訓練一筆：區間、有效時間、點數、回饋",[]],
+  ["db","db_records","逐筆心率","每 2 秒一筆：時間、心率、運動或恢復",[]],
+  ["adm","c_edit","編輯使用者","管理者或醫療人員輸入，存檔後 App 下次生效",
+    [["ad_dob","生日・性別"],["ad_hw","身高・體重"],["ad_zone","訓練區間・最大心率",0,"待決"],["ad_vo2","攝氧量"],["ad_rhr","代填休息心率"]]],
+  ["adm","c_list","群組使用者列表","一眼看每位受訓者目前狀態",
+    [["ls_zone_admin","管理者設定區間",1],["ls_zone_used","最近一次使用區間",1],["ls_coef","最近採用係數（需解鎖）",1],["ls_rhr","最近一筆休息心率",1]]],
+  ["adm","c_hist","訓練歷程","單一受訓者的每次紀錄",
+    [["hs_curve","每次訓練心率曲線",1],["hs_feedback","區間回饋紀錄",1],["hs_rest","3 分鐘檢測趨勢與明細",1,"待修"]]],
+  ["adm","c_rpt","季訓練報告（12 週）","A4 列印或 PDF，可切換季別",
+    [["rpt_basic","1 基本資料",1,"待修"],["rpt_stats","2 統計 8 卡",1,"待修"],["rpt_int","3 強度分佈",1],["rpt_score","4 分數趨勢",1],["rpt_hrv","5 檢測趨勢",1,"待修"],["rpt_met","6 每週運動量",1,"待修"]]],
+  ["adm","c_csv","資料匯出（CSV）","每次訓練一列",
+    [["csv_train","訓練欄位",1,"待修"],["csv_hrv","HRV 欄位",1,"待修"]]]
+];
+
+/* ===== 截圖：[檔名, 說明, 框型 phone|browser|wide] ===== */
+const IMG = {
+  c_home:["app-home.webp","App 首頁。個人資料列已遮蔽。","phone"],
+  c_rest:["app-rest.webp","3 分鐘身體狀態檢測結果：休息心率與 HRV。","phone"],
+  c_zone:["app-zone.webp","連上心率帶後的訓練頁：血條上顯示本次下限與上限，白線為基準心率。","phone"],
+  c_train:["app-train.webp","訓練進行中：大字心率、區間血條、週與本次點數、運動時間。","phone"],
+  app_trainscreen:["app-train153.webp","11/1 開始運動時顯示 153 的畫面（長庚回饋）。","phone"],
+  c_recover:["app-recover.webp","運動後恢復：即時心率、恢復計時、呼吸引導。","phone"],
+  c_report:["app-result.webp","結果頁：週點數山形儀表、本次點數、心率曲線。暱稱已遮蔽。","phone"],
+  app_feedback:["app-feedback.webp","區間回饋問答：左為有效時間不到 4 成，右為超過 8 成。","wide"],
+  c_edit:["adm-edit.webp","後台「編輯使用者」：訓練區間、最大心率、每週目標、攝氧量。","browser"],
+  c_list:["adm-list.webp","群組使用者列表：管理者設定區間與最近一次使用區間並列。登入碼、備註、生日已遮蔽。","browser"],
+  c_hist:["adm-hist.webp","訓練歷程：左側每次紀錄，右側心率曲線與統計。分子分母已遮蔽。","browser"],
+  hs_rest:["adm-hist-rest.webp","訓練歷程的 3 分鐘檢測趨勢：休息心跳率、RMSSD、SDNN，最下方 nLF／nHF 長條目前空白。","browser"],
+  c_rpt:["rpt-stats.webp","季訓練報告第 2 節：8 張統計卡。","browser"],
+  rpt_basic:["rpt-basic.webp","季訓練報告第 1 節：基本資料。登入碼、生日、備註已遮蔽。","browser"],
+  rpt_stats:["rpt-stats.webp","季訓練報告第 2 節：8 張統計卡。","browser"],
+  rpt_hrv:["rpt-hrv.webp","季訓練報告第 5 節：3 分鐘身體狀態檢測趨勢。","browser"],
+  rpt_met:["rpt-met.webp","季訓練報告第 6 節：每週運動量（MET-分鐘）。","browser"],
+  rpt_int:null, rpt_score:null,
+  c_csv:["adm-csv.webp","CSV 匯出內容。登入碼、備註、生日欄已遮蔽。","browser"]
+};
+
+/* ===== 截圖熱區：box=[x%,y%,寬%,高%,"w"=待修]；note=畫面上看不到時的說明 ===== */
+IMG.v_zonetime=["app-result.webp","結果頁：本次有效時間。","phone"];
+const HOT={
+ app_login:{note:"登入畫面不在這張截圖中。"},
+ app_profile:{box:[[3,34.5,94,4.6]],note:"個人資料列（暱稱、生日、性別），截圖中已遮蔽。"},
+ app_ppiv:{box:[[3,69.2,94,2.9],[5,42,90,13]]},
+ app_week:{box:[[51,22.5,44,7.5]]},
+ v_rhr:{box:[[22,25.5,57,7.5]]},
+ v_rmssd:{box:[[22,52,53,6]]},
+ v_sdnn:{box:[[22,58.5,21,6.5]]},
+ v_nlfhf:{box:[[22,66.5,57,8]]},
+ v_base:{box:[[9,16,9,9]],note:"白線與盾牌圖示就是基準心率的位置。"},
+ v_hrmax:{note:"最大心率不顯示在 App 畫面上，只用來計算區間。後台有填時，可在「編輯使用者」看到。"},
+ v_thr:{box:[[37,17,40,7.5]],note:"血條綠色段的兩端就是下限與上限。"},
+ app_trainscreen:{box:[[8,9.5,84,15]]},
+ v_hr:{box:[[65,10,25,6.5]],note:"存檔的就是畫面上這個平滑後的心率，每 2 秒取一筆。"},
+ v_points:{box:[[36,32,30,14]]},
+ v_zonetime:{box:[[3,50,30,8.5]]},
+ v_rechr:{box:[[17,10,66,35]]},
+ v_recmin:{note:"恢復最低心率不顯示在畫面上，只在 10 分鐘自動結束時用語音播報。"},
+ v_coef:{note:"係數不顯示在 App 畫面上，存在手機裡。後台需解鎖才看得到。"},
+ ad_zone:{box:[[1,40,97,10.5]]},
+ ad_vo2:{box:[[1,84,98,5]]},
+ ad_dob:{note:"在同一個編輯視窗的上方，這張截圖沒有涵蓋到。"},
+ ad_hw:{note:"在同一個編輯視窗，這張截圖沒有涵蓋到。"},
+ ad_rhr:{note:"在同一個編輯視窗，這張截圖沒有涵蓋到。"},
+ ls_zone_admin:{box:[[47,6,16,90]]},
+ ls_zone_used:{box:[[64,6,17,90]]},
+ ls_coef:{note:"在列表更右邊的欄位，這張截圖沒有涵蓋到。"},
+ ls_rhr:{note:"顯示在編輯視窗，這張截圖沒有涵蓋到。"},
+ hs_curve:{box:[[26,4,73.5,94]]},
+ hs_feedback:{note:"在每筆訓練統計的下方，這張截圖沒有涵蓋到。"},
+ hs_rest:{box:[[1,68,98,31,"w"]]},
+ rpt_basic:{box:[[58,52,40,23,"w"]]},
+ rpt_stats:{box:[[1,15,98,64],[1,79,98,13,"w"]]},
+ rpt_met:{box:[[10,5,8,8,"w"],[57,17.5,22,6,"w"],[44,91,21,7,"w"]]},
+ csv_train:{box:[[28,0,8.6,100,"w"]]},
+ csv_hrv:{note:"HRV 欄位在表格更右邊，這張截圖沒有涵蓋到。"}
+};
+
+/* ===== 連線 [from, to, 類型, 標籤]  set 後台寫入／fetch 雲端→App／up App 上傳／intra App 內部／read 雲端→後台 ===== */
+const EDGES = [
+  ["ad_dob","db_users","set","寫入"],["ad_hw","db_users","set","寫入"],
+  ["ad_zone","db_zones","set","寫入"],["ad_vo2","db_zones","set","寫入"],
+  ["ad_rhr","db_rest","set","只有休息心率"],
+  ["db_users","app_login","fetch","登入時帶回生日性別"],["db_users","app_profile","fetch","每次進首頁更新"],
+  ["db_rest","app_ppiv","fetch","最近一次檢測日期"],
+  ["db_rest","v_base","fetch","近 30 天最低"],
+  ["db_zones","v_hrmax","fetch","後台有填就採用"],["db_zones","v_thr","fetch","後台區間"],
+  ["v_rhr","db_rest","up","上傳"],["v_rmssd","db_rest","up","上傳"],["v_sdnn","db_rest","up","上傳"],["v_nlfhf","db_rest","up","上傳"],
+  ["v_hr","db_records","up","每 2 秒"],["v_rechr","db_records","up","階段＝恢復"],
+  ["v_thr","db_session","up","本次採用區間"],["v_base","db_session","up","本次基準"],
+  ["v_zonetime","db_session","up","有效秒數"],["v_points","db_session","up","點數分子・分母"],
+  ["v_coef","db_session","up","本次採用係數"],["app_feedback","db_session","up","回答・有效率"],
+  ["v_rhr","app_ppiv","intra","完成本輪"],["v_rhr","app_result","intra","「休息心率」格"],
+  ["app_profile","v_hrmax","intra","220 − 年齡"],
+  ["v_base","v_thr","intra","基準"],["v_hrmax","v_thr","intra","最大心率"],["v_coef","v_thr","intra","係數"],
+  ["v_thr","app_trainscreen","intra","血條上下限"],["app_trainscreen","v_hr","intra","平滑後心率"],
+  ["v_thr","v_zonetime","intra","≥ 下限才算"],["v_base","v_points","intra","扣掉基準"],
+  ["v_zonetime","app_feedback","intra","有效率"],["v_points","app_week","intra","本週加總"],
+  ["app_feedback","v_coef","intra","答「是」調整"],
+  ["db_zones","ls_zone_admin","read",""],["db_session","ls_zone_used","read","最近一筆"],
+  ["db_session","ls_coef","read",""],["db_rest","ls_rhr","read",""],
+  ["db_records","hs_curve","read","心率曲線"],["db_session","hs_curve","read","區間・點數"],
+  ["db_session","hs_feedback","read",""],["db_rest","hs_rest","read","所選天數內每一筆"],
+  ["db_users","rpt_basic","read","生日・身高體重"],["db_zones","rpt_basic","read","峰值攝氧量"],["db_session","rpt_basic","read","本季最後區間"],
+  ["db_session","rpt_stats","read","次數・時間・點數"],["db_records","rpt_stats","read","本季最高心率"],["db_rest","rpt_stats","read","本季最低休息心率"],
+  ["db_records","rpt_int","read","高／中強度分鐘"],["db_session","rpt_score","read",""],["db_rest","rpt_hrv","read",""],
+  ["db_session","rpt_met","read","有效時間・點數分子"],["db_zones","rpt_met","read","攝氧量・最大心率"],["db_users","rpt_met","read","身高體重"],
+  ["db_session","csv_train","read",""],["db_records","csv_train","read","心率歷程"],["db_rest","csv_hrv","read","訓練前 30 天最近一筆"]
+];
+
+/* ===== 說明內容 ===== */
+const F = s => `<span class="f">${s}</span>`;
+const INFO = {
+ c_home:{what:"受訓者打開 App 後的起點：首頁上方是本週點數，中間是 3 分鐘檢測入口與最近結果，下方是「進入心訓」。"},
+ app_login:{what:"群組使用者輸入院所發給的登入碼（病歷號）。登入時雲端一併回傳生日與性別。",freq:"第一次登入；之後自動登入。"},
+ app_profile:{what:"首頁收合列顯示暱稱、生日、性別。",calc:"生日換算年齡。後台沒有填最大心率時，用 220 − 年齡當最大心率。",freq:"每次進首頁背景向雲端更新，後台補填不必重新登入。",store:"來自後台「編輯使用者」的生日、性別。"},
+ app_ppiv:{what:"提醒受訓者做 3 分鐘身體狀態檢測的週期規則，首頁黃色警示列即是。",calc:"每 28 天一輪，每輪第 1 天固定是週一。<ul><li>第 1–9 天：進首頁詢問，可略過</li><li>第 10–13 天：倒數剩 5 到 2 天，可略過</li><li>第 14 天起本輪還沒檢測：「進入心訓」被擋住，量完才放行</li></ul>本輪任何一天完成檢測，本輪就不再提醒。後台代填休息心率也算完成。",freq:"每 28 天一輪。"},
+ app_week:{what:"首頁與結果頁顯示的本週累計點數。",calc:F("週心訓健康點數 = 本週每次「本次心訓健康點數」相加")+"≥ 100 為達標。",freq:"每週一 00:00（台北時間）歸零。"},
+ c_rest:{what:"坐姿靜止 3 分鐘，同時量休息心率與心率變異度（HRV）。"},
+ v_rhr:{what:"本次檢測的休息心率（bpm）。",calc:"第 30–180 秒所有心率讀值中的<b>最低值</b>。前 30 秒讓心跳穩定，不採計。",freq:"每次檢測一個值。",store:"上傳到「休息心率紀錄」。",show:"<ul><li>App 結果頁「休息心率」格：顯示最近一次檢測值</li><li>訓練歷程：3 分鐘檢測趨勢與明細</li><li>季報告第 2 節「本季最低休息心率」、第 5 節折線</li><li>群組使用者編輯表單：最近一筆</li><li>CSV「最近一次量的 3min 休息心率」</li></ul>另外，近 30 天的最低值會成為訓練用的基準心率。",issue:"<b>待決：</b>App 結果頁那一格沒有效期判斷，最後一次檢測即使在很久以前也照樣顯示，也不顯示日期。長庚建議 30 天內沒檢測時改顯示「30 天內沒有測量」。"},
+ v_rmssd:{what:"相鄰兩次心跳間隔差值的均方根（毫秒），反映逐拍之間的短期變化。",calc:"取第 30–180 秒的逐拍間隔。<ul><li>Magene H803 臂帶：用它的光學脈搏波（每秒 25 點）找出每一拍</li><li>其他心率帶：用裝置送出的心跳間隔（最近 400 筆）</li><li>若裝置送的間隔是由整數心率換算的假值，判定不可信，不顯示</li></ul>",freq:"每次檢測一個值。",store:"上傳到「休息心率紀錄」。",show:"訓練歷程 RMSSD 折線與明細、季報告第 5 節、CSV「RMSSD(ms)」。"},
+ v_sdnn:{what:"整段量測中所有心跳間隔的標準差（毫秒），反映整體變化程度。",calc:"與 RMSSD 用同一段逐拍間隔。",freq:"每次檢測一個值。",store:"上傳到「休息心率紀錄」。",show:"訓練歷程 SDNN 折線與明細、季報告第 5 節、CSV「SDNN(ms)」。"},
+ v_nlfhf:{what:"心跳間隔變化依快慢分成低頻與高頻後，各自所占的比例（%）。",calc:F("LF：0.04–0.15 Hz　HF：0.15–0.4 Hz\nnLF = LF ÷ (LF + HF) × 100\nnHF = HF ÷ (LF + HF) × 100")+"兩者相加為 100。pNN50、SD1、SD2、LF/HF 也有計算與上傳，只出現在明細表與 CSV。",store:"上傳到「休息心率紀錄」（存 LF、HF 原值）。",show:"訓練歷程與季報告第 5 節的 nLF／nHF 堆疊長條、CSV「nLF(%)」「nHF(%)」。",issue:"<b>待修：</b>後台與季報告的 nLF／nHF 堆疊長條目前畫不出來。數值本身有存，明細表與 CSV 看得到。"},
+ c_zone:{what:"每次訓練開始前，用基準心率、最大心率、係數算出本次的心率區間。"},
+ v_base:{what:"訓練區間與點數計算用的安靜心率基準（Karvonen 公式中的安靜心率）。",calc:"雲端「休息心率紀錄」<b>近 30 天的最低值</b>（滾動 30 天）。10/19 以前的版本還會比較訓練前 2 分鐘量測值，該功能已移除，舊值 11 月中後自然淡出。雲端都沒有資料時，用手機上最近一次休息心率。",freq:"每次訓練前重算。",store:"上傳到「訓練紀錄」的本次基準。",show:"App 訓練畫面血條上的白線與盾牌圖示、CSV「Karvonen base」、季報告運動量計算。"},
+ v_hrmax:{what:"本次採用的最大心率。",calc:"後台有填「最大心率」就用後台值，否則用 220 − 年齡。",freq:"每次訓練前。"},
+ v_thr:{what:"本次訓練的目標心率區間下限與上限。",calc:"先算心率儲備："+F("心率儲備 = 最大心率 − 基準心率")+"<b>後台沒有設定區間（公式模式）</b>"+F("下限 = 基準 + 心率儲備 × 下限係數（預設 40%）\n上限 = 基準 + 心率儲備 × 上限係數（預設 70%）")+"<b>後台有設定區間（後台模式）</b>：後台值是起點，再加上回饋問答累積的偏移。"+F("下限 = 後台下限 + (下限係數 − 40%) × 心率儲備\n上限 = 後台上限 + (上限係數 − 70%) × 心率儲備")+"<b>實例</b>：後台設 115–130、最大心率 161、基準 48，心率儲備 113。回饋累積下限 −10%、上限 −2%，得到 115 − 11.3 ≈ 104、130 − 2.3 ≈ 128，與 App 顯示的 104–128 相符。",freq:"每次訓練前都向雲端重抓後台設定；離線時沿用上一次區間。",store:"上傳到「訓練紀錄」的本次下限、上限與來源（後台或公式）。",show:"群組使用者列表「最近一次使用區間」、訓練歷程白色虛線、季報告第 1 節、CSV 訓練區間下限與上限。",issue:"<b>待決：</b>11/8 決議「後台直接輸入數值就覆蓋」。目前後台值會再被 App 的回饋偏移調整，所以後台填 115–130、App 實際用 104–128。要做到覆蓋，需在後台存檔時把該受訓者的回饋偏移歸零（尚未實作）。"},
+ c_train:{what:"跟著步頻節拍運動，畫面即時顯示心率與區間，語音提醒。"},
+ app_trainscreen:{what:"訓練畫面的大字心率、血條與語音播報用的心率。",calc:"心率帶約每秒送 1 筆。App 先丟掉 30–250 以外的值，再平滑："+F("顯示值 = 新讀值 × 25% + 前一個顯示值 × 75%")+"第一筆讀值直接採用。進出區間需持續 10 秒才切換。",freq:"每秒更新；語音每 60 秒報心率，高於上限每 30 秒提醒。",issue:"<b>待修：</b>開始運動時顯示 153，約 15 秒後才回到 107。平滑只會讓數字變化變慢，不會產生比心率帶送來更高的數字，所以 153 是心率帶開頭送出的讀值，而第一筆又直接顯示。11/8 決議試加極值過濾（尚未實作）。"},
+ v_hr:{what:"訓練與恢復期間存檔的心率序列。",calc:"每 2 秒取一次平滑後的心率，標記階段（運動或恢復）。",freq:"每 2 秒一筆，訓練結束後一次上傳。",store:"上傳到「逐筆心率」。",show:"訓練歷程心率曲線、季報告第 3 節高／中強度分鐘與第 2 節本季最高心率、CSV「心率歷程」與平均、最高心率。"},
+ v_zonetime:{what:"本次訓練中心率達到區間下限以上的累計時間。",calc:"心率 ≥ 下限的秒數相加，<b>高於上限也算</b>。",store:"上傳到「訓練紀錄」。",show:"訓練歷程「有效時間」、季報告第 2 節平均每週有效運動分鐘、第 6 節運動量、CSV「有效運動時間(秒)」。結果頁回饋問答的有效率也用它。"},
+ v_points:{what:"本次訓練的點數，衡量心率高於基準的程度乘上時間。",calc:F("本次分子 = Σ (心率 − 基準) × 分鐘　〔只算心率 ≥ 下限〕\n本次分母 = (下限 − 基準) × 每週目標分鐘（預設 150）\n本次心訓健康點數 = 分子 ÷ 分母 × 100")+"意思是：以下限強度持續運動滿每週目標分鐘，剛好 100 分。每次用自己當下的區間計算，之後改區間不影響已完成的分數。",freq:"每秒累計，訓練結束時定案。",store:"上傳到「訓練紀錄」（分子、分母），雲端再算出本次與本週分數。",show:"App 首頁與結果頁、訓練歷程、季報告第 2 節與第 4 節、CSV。分子與分母屬內部資訊，後台需解鎖才顯示。"},
+ c_recover:{what:"訓練結束後的恢復量測，語音引導呼吸。"},
+ v_rechr:{what:"恢復期的心率序列。",calc:"與訓練中相同，每 2 秒一筆，階段標記為恢復。",store:"上傳到「逐筆心率」。",show:"訓練歷程心率曲線的黃色段。"},
+ v_recmin:{what:"恢復期最低心率。",calc:"最後 60 秒的最低心率；恢復不足 60 秒就按完成時，取全部恢復期的最低值。",show:"到 10 分鐘自動結束時語音播報「最低心率 N」。"},
+ c_report:{what:"訓練結束後的結果頁。"},
+ app_result:{what:"結果頁內容。",show:"<ul><li>週點數山形儀表與本次點數</li><li>有效時間與總運動時間</li><li>休息心率：最近一次 3 分鐘檢測值</li><li>最高心率、平均心率</li><li>心率曲線</li></ul>進頁約 3 秒後自動存圖到相簿；可回看 7 天內的紀錄。"},
+ app_feedback:{what:"依本次表現問一題，確認強度是否合適。",calc:"有效率 = 有效時間 ÷ 運動時間。<ul><li>運動 10 分鐘以內：不問</li><li>有效率 &lt; 40%：問「您運動時心率超過區間下限 L 是否覺得困難？」</li><li>40–80%：不問</li><li>&gt; 80%：問「您是否覺得心率維持在下限 L 以上太輕鬆？」</li></ul>選項：是、否、不確定（下次留意）。只有答「是」會調整。係數已到上下限時不問。",freq:"每次訓練結束，符合條件才問。",store:"回答、有效率、係數變化存到「訓練紀錄」。",show:"訓練歷程每筆下方的「區間回饋」行。"},
+ v_coef:{what:"決定區間位置的兩個百分比，存在手機上。",calc:"答「是，困難」：下限 −5%（有效率低於 20% 時 −10%）、上限 −2%。<br>答「是，太輕鬆」：下限 +5%、上限 +2%。<br>百分比指心率儲備的比例。下限範圍 20–60%，上限 60–80%。",freq:"答完立即存，下一次訓練生效。",store:"每次訓練把當下採用的係數上傳到「訓練紀錄」。",show:"群組使用者列表「最近採用係數」，需解鎖才顯示。"},
+ db_users:{what:"受訓者基本資料表。",fields:["登入碼","備註","標籤","生日","性別","身高","體重"],store:"由後台「編輯使用者」寫入。",show:"App 登入與首頁讀生日性別；季報告第 1 節與第 6 節運動量（身高體重用來推算靜態攝氧量）。"},
+ db_zones:{what:"後台設定的訓練參數表，每位受訓者一筆。",fields:["區間下限","區間上限","最大心率","每週目標分鐘","靜態攝氧量","峰值攝氧量"],calc:"下限、上限、最大心率三項全填或全空；每週目標空白用 150 分鐘。",store:"由後台「編輯使用者」寫入。",show:"App 每次訓練前讀取；群組使用者列表「管理者設定區間」；季報告第 1 節與第 6 節。"},
+ db_rest:{what:"每次 3 分鐘檢測一筆的紀錄表。",fields:["量測時間","休息心率","RMSSD","SDNN","pNN50","SD1","SD2","LF","HF","LF/HF","拍數"],store:"寫入來源有三個：<ul><li>App 3 分鐘檢測：休息心率＋HRV</li><li>後台代填：只有休息心率</li><li>每次訓練上傳時，雲端用 App 記得的最近休息心率補寫一筆：只有休息心率，時間是訓練開始時間</li></ul>",show:"App 基準心率與檢測提醒；後台訓練歷程檢測趨勢、季報告第 2、5 節、CSV HRV 欄。",issue:"<b>待修：</b>第三個來源（訓練時補寫）會產生沒有 HRV 的紀錄，日期是訓練日。CSV 的 HRV 欄抓到這筆時，就出現「HRV量測日期有值、數值空白」；訓練歷程明細與趨勢圖也會多出這些點。建議加上來源標記，HRV 相關畫面只取真正的檢測。"},
+ db_session:{what:"每次訓練一筆的摘要表。",fields:["開始／結束時間","恢復起訖","本次區間與來源","有效秒數","基準心率","係數","點數分子／分母","回饋問答 5 欄"],store:"App 訓練結束後上傳；失敗會在下次開 App 時自動重送。",show:"後台列表、訓練歷程、季報告第 1、2、4、6 節、CSV。"},
+ db_records:{what:"每 2 秒一筆的心率明細表。",fields:["時間","心率","階段（運動／恢復）"],calc:"30 分鐘訓練約 900 筆。",store:"App 訓練結束後上傳。",show:"訓練歷程心率曲線、季報告第 2 節本季最高心率與第 3 節強度分佈、CSV 心率歷程。"},
+ c_edit:{what:"後台「編輯使用者」視窗，設定會直接影響 App。"},
+ ad_dob:{what:"受訓者生日與性別。",show:"App 首頁顯示並用來算年齡與 220 − 年齡；季報告第 1 節。"},
+ ad_hw:{what:"身高、體重。",show:"季報告第 1 節；季報告運動量在沒有實測靜態攝氧量時，用身高體重年齡性別推算（Mifflin 公式）。"},
+ ad_zone:{what:"訓練區間下限、上限、最大心率。三項全填或全空；只填部分時，存檔會用公式補齊。",calc:"有填：App 改用「後台模式」計算區間，但仍會疊加回饋偏移（見「區間下限／上限」）。全空：App 用公式模式。",freq:"存檔後，受訓者下一次訓練生效。",issue:"<b>待決：</b>11/8 決議後台輸入值應直接覆蓋 App。目前會被回饋偏移調整，尚未實作覆蓋。"},
+ ad_vo2:{what:"靜態與峰值攝氧量（mL/kg/min）。",calc:"峰值：做過心肺運動測試（CPET）才填；沒填報告用年齡性別推估。靜態：沒填用身高體重推算，參數不足以 3.5 計。",show:"只有季報告用到：第 1 節峰值攝氧量、第 6 節每週運動量。App 不讀。"},
+ ad_rhr:{what:"由院所自行量測後代填的休息心率。",store:"寫入「休息心率紀錄」，只有休息心率、沒有 HRV。",show:"App 進首頁時同步，算作完成本輪 3 分鐘檢測，也會進入近 30 天基準心率。"},
+ c_list:{what:"後台群組使用者列表。"},
+ ls_zone_admin:{what:"後台目前設定的區間。未設定時顯示「未設定」。"},
+ ls_zone_used:{what:"該受訓者最近一次訓練實際採用的區間。",calc:"已包含回饋偏移，所以常和「管理者設定區間」不同。"},
+ ls_coef:{what:"最近一次訓練採用的係數偏移。",show:"屬內部資訊，需在訓練歷程心率圖上解鎖後才顯示。"},
+ ls_rhr:{what:"最近一筆休息心率與日期，顯示在編輯表單。"},
+ c_hist:{what:"單一受訓者的訓練歷程頁。"},
+ hs_curve:{what:"每次訓練的心率曲線與統計。",show:"綠色＝區間內、藍色＝區間外、黃色＝恢復期，灰色虛線＝本次下限與上限。下方列有效時間、本次與週點數。"},
+ hs_feedback:{what:"每筆訓練下方的「區間回饋」行：問句、回答、本次有效率。係數變化需解鎖才顯示。"},
+ hs_rest:{what:"3 分鐘身體狀態檢測趨勢與每次檢測明細表。",show:"休息心跳率、RMSSD、SDNN 三條折線，nLF／nHF 堆疊長條，下方明細表列出每一次的所有數值。橫軸固定為所選的 30／90／180／365 天。",issue:"<b>待修：</b>nLF／nHF 長條未顯示；圖例 11/8 建議移除或移到圖上方。明細會混入訓練時補寫的紀錄（見「休息心率紀錄」）。"},
+ c_rpt:{what:"季訓練報告。一季 12 週，從第一次訓練那一週的週一起算，可切換季別。"},
+ rpt_basic:{what:"受訓者基本資料。",show:"登入碼、備註、生日、性別、訓練心率區間（本季最後一次訓練實際採用，標示第 N 季 Day M）、身高體重、峰值攝氧量（有 CPET 實測才顯示，否則 N/A）。",issue:"<b>待修：</b>11/8 建議拿掉 BMI。"},
+ rpt_stats:{what:"8 張統計卡。",calc:"平均每週運動次數、平均每週總運動時間、平均每週有效運動分鐘、達標週數（≥100）、平均週心訓健康點數、最佳週點數、本季最低休息心率、本季最高心率。<br>「平均每週」除以本季已過週數，進行中的季不會被未來週數拉低。",issue:"<b>待修：</b>11/8 建議移除卡片下方「運動前心率平均」與「3 分鐘休息心率平均」兩行。"},
+ rpt_int:{what:"每週訓練強度分佈：上方高強度、下方中強度兩張長條圖，共用同一縱軸。",calc:"由逐筆心率計算，每筆算 2 秒。高強度＝心率高於上限；中強度＝下限到上限之間。"},
+ rpt_score:{what:"週心訓健康點數的趨勢。"},
+ rpt_hrv:{what:"3 分鐘身體狀態檢測趨勢：休息心跳率、RMSSD、SDNN 折線與 nLF／nHF 堆疊長條。有 HRV 資料時，報告最後附「心率變異度指標說明」。",issue:"<b>待修：</b>nLF／nHF 長條未顯示。11/8 另有說明文字修訂。"},
+ rpt_met:{what:"每週運動量（MET-分鐘），12 根長條加紅色虛線基準。",calc:F("每次 MET-分鐘 = 靜態攝氧 ÷ 3.5 × 有效分鐘\n  + (峰值攝氧 − 靜態攝氧) ÷ (3.5 × (最大心率 − 基準)) × 本次分子")+"紅虛線＝健康點數 100 分對應的運動量。靜態攝氧：後台實測 → 身高體重推算 → 3.5。峰值攝氧：CPET 實測 → 年齡性別推估。",issue:"<b>待修：</b>11/8 建議拿掉「估計」兩字、橫軸改為「日期」，說明文字三處修改。"},
+ c_csv:{what:"後台匯出的 CSV，每次訓練一列。"},
+ csv_train:{what:"訓練相關欄位：登入碼、日期時間、區間、有效時間、平均與最高心率、點數、回饋問答、每週運動量、心率歷程。",issue:"<b>待修：</b>11/8 要求移除「運動前心率」欄；多人匯出檔名用群組名、單人用登入碼；改成每位受訓者「訓練」與「HRV」兩個分頁（需改為 Excel 檔）。"},
+ csv_hrv:{what:"HRV 欄位：HRV 量測日期、RMSSD、SDNN、pNN50、SD1、SD2、nLF、nHF、LF/HF。",calc:"取該次訓練開始前 30 天內<b>最近一筆</b>休息心率紀錄，與「最近一次量的 3min 休息心率」欄同一筆。同一次檢測會重複出現在多列；30 天內沒紀錄則留白。",issue:"<b>待修：</b>最近一筆常是訓練時補寫、沒有 HRV 的紀錄，所以出現「有日期、沒數值」。11/8 決議 HRV 改成獨立分頁，每次檢測一列，可一併解決。"}
+};
+
+const STEPS = [
+ {t:"後台設定",n:["c_edit","ad_dob","ad_hw","ad_zone","ad_vo2","ad_rhr","db_users","db_zones","db_rest"],
+  p:"管理者建立受訓者並填生日、性別、身高、體重，可選擇設定訓練區間與最大心率、攝氧量，或代填一筆休息心率。這些寫進雲端三張表，App 下一次讀取時生效。"},
+ {t:"登入與首頁",n:["c_home","app_login","app_profile","app_ppiv","app_week","db_users","db_rest"],
+  p:"受訓者用登入碼登入，App 帶回生日與性別。首頁依 28 天週期提醒做 3 分鐘檢測，並顯示本週點數。"},
+ {t:"3 分鐘檢測",n:["c_rest","v_rhr","v_rmssd","v_sdnn","v_nlfhf","db_rest","app_ppiv","app_result"],
+  p:"坐姿靜止 180 秒，採第 30–180 秒。產生休息心率（最低值）與 RMSSD、SDNN、nLF／nHF，上傳到休息心率紀錄，並算作完成本輪提醒。"},
+ {t:"算訓練區間",n:["c_zone","v_base","v_hrmax","v_thr","db_rest","db_zones","app_profile","v_coef"],
+  p:"按進入心訓、連上心率帶後，App 取近 30 天最低休息心率當基準，配合最大心率與係數算出區間。後台有設定區間時，以後台值為起點再加回饋偏移。"},
+ {t:"訓練與恢復",n:["c_train","app_trainscreen","v_hr","v_zonetime","v_points","c_recover","v_rechr","v_recmin","v_thr","v_base","db_records","db_session"],
+  p:"訓練中心率平滑後即時判定區間、累計有效時間與點數，每 2 秒存一筆。結束後恢復最長 10 分鐘，全部資料一次上傳。"},
+ {t:"結果與回饋",n:["c_report","app_result","app_feedback","v_coef","v_zonetime","v_points","app_week","db_session","v_thr"],
+  p:"結果頁顯示本次與本週點數。運動超過 10 分鐘且有效率偏低或偏高時問一題，答「是」調整係數，下一次訓練區間跟著變。"},
+ {t:"後台查看",n:["c_list","ls_zone_admin","ls_zone_used","ls_coef","ls_rhr","c_hist","hs_curve","hs_feedback","hs_rest","c_rpt","rpt_basic","rpt_stats","rpt_int","rpt_score","rpt_hrv","rpt_met","c_csv","csv_train","csv_hrv","db_users","db_zones","db_rest","db_session","db_records"],
+  p:"後台從雲端五張表讀取：列表看目前狀態、訓練歷程看每一次、季報告看 12 週彙整、CSV 匯出原始數值。"}
+];
+
+/* ===== 建立節點 ===== */
+const NODE = {};
+const laneEl = {app:document.getElementById("lane-app"),db:document.getElementById("lane-db"),adm:document.getElementById("lane-adm")};
+const KINDLABEL = {app:["受訓者 App","k-app"],db:["雲端資料","k-db"],adm:["後台","k-adm"]};
+const DBICON = '<svg class="dbi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>';
+let appN=0, admN=0;
+const ADMLETTER="ABCDE";
+for (const [lane,id,title,desc,chips] of CARDS){
+  const card=document.createElement("div"); card.className="card"; card.dataset.id=id;
+  NODE[id]={el:card,lane,label:title,card:null,chips:[]};
+  const body=document.createElement("div"); body.style.minWidth="0";
+  const img=IMG[id];
+  if(lane!=="db" && img){
+    const t=document.createElement("button"); t.type="button"; t.className="thumb"; t.setAttribute("aria-label",title+" 截圖");
+    t.innerHTML=`<img src="img/${img[0]}" alt="" loading="lazy">`; t.addEventListener("click",()=>select(id));
+    card.appendChild(t);
+  }
+  if(lane==="db") card.insertAdjacentHTML("afterbegin",DBICON);
+  const b=document.createElement("button"); b.className="title"; b.type="button";
+  const num = lane==="app" ? String(++appN) : lane==="adm" ? ADMLETTER[admN++] : "";
+  b.innerHTML=(num?`<span class="step">${num}</span>`:"")+title;
+  b.addEventListener("click",()=>select(id)); body.appendChild(b);
+  const d=document.createElement("div"); d.className="desc"; d.textContent=desc; body.appendChild(d);
+  if (chips.length){
+    const wrap=document.createElement("div"); wrap.className="chips";
+    for (const [cid,label,isVal,tag] of chips){
+      const c=document.createElement("button"); c.type="button"; c.className="chip"+(isVal?" val":""); c.dataset.id=cid;
+      c.textContent=label;
+      if(tag){const t=document.createElement("span");t.className="tag";t.textContent=tag;c.appendChild(t);}
+      c.addEventListener("click",()=>select(cid));
+      wrap.appendChild(c); NODE[cid]={el:c,lane,label,card:id,chips:[]}; NODE[id].chips.push(cid);
+    }
+    body.appendChild(wrap);
+  }
+  card.appendChild(body);
+  if(lane==="db"){let w=laneEl.db.querySelector(".dbwrap");if(!w){w=document.createElement("div");w.className="dbwrap";laneEl.db.appendChild(w);}w.appendChild(card);}
+  else laneEl[lane].appendChild(card);
+}
+
+/* ===== 連線 ===== */
+const LANEIDX={app:0,db:1,adm:2};
+const svg=document.getElementById("edges"), lsvg=document.getElementById("labels"), map=document.getElementById("map");
+const NS="http://www.w3.org/2000/svg";
+const edgeEls=[];
+function mk(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+(function(){
+  const defs=mk("defs",{});
+  for(const t of ["up","set","read","fetch","intra"]){
+    const m=mk("marker",{id:"mk-"+t,viewBox:"0 0 10 10",refX:"9",refY:"5",markerWidth:"6",markerHeight:"6",orient:"auto-start-reverse"});
+    m.appendChild(mk("path",{d:"M0,0 L10,5 L0,10 z",class:"mk-"+(t==="intra"?"up":t==="read"?"read":t)})); defs.appendChild(m);
+  }
+  svg.appendChild(defs);
+})();
+/* 圖上用的短標籤（完整說法顯示在說明面板） */
+const SHORT={"所選天數內每一筆":"每一筆","訓練前 30 天最近一筆":"最近一筆","本季最低休息心率":"最低休息心率","最近一次檢測日期":"檢測日期",
+ "登入時帶回生日性別":"帶回生日性別","每次進首頁更新":"進首頁更新","後台有填就採用":"有填就採用","有效時間・點數分子":"有效時間・分子",
+ "攝氧量・最大心率":"攝氧量等","生日・身高體重":"生日・身高","次數・時間・點數":"次數・時間","高／中強度分鐘":"強度分鐘","點數分子・分母":"分子・分母"};
+for (const [a,b,type,label] of EDGES){
+  const p=mk("path",{class:type,"marker-end":`url(#mk-${type})`}); svg.appendChild(p);
+  const t=mk("text",{"text-anchor":"middle"}); t.textContent=SHORT[label]||label; lsvg.appendChild(t);
+  edgeEls.push({a,b,type,label,p,t});
+}
+function box(id){
+  // x 取所屬卡片的左右邊緣（連線不穿過卡片），y 取項目本身的中心
+  const n=NODE[id], r=n.el.getBoundingClientRect(), c=(n.card?NODE[n.card].el:n.el).getBoundingClientRect(), m=map.getBoundingClientRect();
+  return {l:c.left-m.left,r:c.right-m.left,cy:(r.top+r.bottom)/2-m.top};
+}
+const narrow=()=>window.matchMedia("(max-width:900px)").matches;
+function layout(){
+  if(narrow()) return;
+  for(const g of [svg,lsvg]){g.setAttribute("width",map.scrollWidth); g.setAttribute("height",map.scrollHeight);}
+  for(const e of edgeEls){
+    const A=box(e.a),B=box(e.b),la=LANEIDX[NODE[e.a].lane],lb=LANEIDX[NODE[e.b].lane];
+    let x1,y1=A.cy,x2,y2=B.cy,c1,c2;
+    if(la<lb){x1=A.r;x2=B.l-2;const dx=(x2-x1)*.5;c1=[x1+dx,y1];c2=[x2-dx,y2];}
+    else if(la>lb){x1=A.l;x2=B.r+2;const dx=(x1-x2)*.5;c1=[x1-dx,y1];c2=[x2+dx,y2];}
+    else{x1=A.l;x2=B.l-2;const out=Math.min(x1,x2)-22-Math.min(30,Math.abs(y2-y1)*.08);c1=[out,y1];c2=[out,y2];}
+    e.p.setAttribute("d",`M${x1},${y1} C${c1[0]},${c1[1]} ${c2[0]},${c2[1]} ${x2},${y2}`);
+    const mx=.125*x1+.375*c1[0]+.375*c2[0]+.125*x2, my=.125*y1+.375*c1[1]+.375*c2[1]+.125*y2;
+    if(la===lb){e.t.setAttribute("text-anchor","end");e.t.setAttribute("x",mx-5);}else{e.t.setAttribute("text-anchor","middle");e.t.setAttribute("x",mx);}
+    e.by=my+4; e.t.setAttribute("y",e.by);
+  }
+  placeLabels();
+}
+/* 標籤避讓：同一目標的同名標籤只留一個；其餘重疊時往下錯開 */
+function placeLabels(){
+  if(narrow()) return;
+  const on=edgeEls.filter(e=>e.t.classList.contains("on")&&e.label);
+  on.forEach(e=>{e.t.classList.remove("dup"); if(e.by!=null) e.t.setAttribute("y",e.by);});
+  const seen=new Set();
+  for(const e of on){const k=e.b+"|"+e.label+"|"+e.type; if(seen.has(k)) e.t.classList.add("dup"); else seen.add(k);}
+  const vis=on.filter(e=>!e.t.classList.contains("dup")).sort((a,b)=>a.by-b.by);
+  const placed=[];
+  for(const e of vis){
+    let bb=e.t.getBBox(), y=e.by, guard=0, moved=true;
+    while(moved && guard++<20){ moved=false;
+      for(const p of placed){
+        const top=bb.y+(y-e.by), bot=top+bb.height;
+        if(bb.x<p.x+p.w+4 && bb.x+bb.width+4>p.x && top<p.y+p.h+4 && bot+4>p.y){ y=p.y+p.h+4+(e.by-bb.y); moved=true; }
+      }
+    }
+    e.t.setAttribute("y",y);
+    placed.push({x:bb.x,w:bb.width,y:bb.y+(y-e.by),h:bb.height});
+  }
+}
+
+/* ===== 選取與高亮 ===== */
+const OUT={},IN={};
+for(const e of edgeEls){(OUT[e.a]??=[]).push(e);(IN[e.b]??=[]).push(e);}
+function clear(){
+  document.body.classList.remove("sel");
+  document.querySelectorAll(".on,.focus").forEach(x=>x.classList.remove("on","focus"));
+  edgeEls.forEach(e=>{e.p.classList.remove("on");e.t.classList.remove("on");});
+}
+function light(id){const n=NODE[id];n.el.classList.add("on");if(n.card)NODE[n.card].el.classList.add("on");}
+function walk(starts,dir,depth){
+  const seen=new Set(starts); let front=[...starts];
+  for(let d=0;d<depth;d++){const nx=[];
+    for(const id of front){for(const e of (dir==="out"?OUT[id]:IN[id])||[]){
+      const o=dir==="out"?e.b:e.a; e.p.classList.add("on"); e.t.classList.add("on");
+      if(!seen.has(o)){seen.add(o);nx.push(o);} }}
+    front=nx;}
+  return seen;
+}
+function openPanel(){document.body.classList.add("panel-open");}
+function closePanel(){document.body.classList.remove("panel-open");}
+function select(id){
+  clear(); setStepPressed(-2); document.body.classList.add("sel");
+  const n=NODE[id];
+  const starts = n.chips.length ? [id,...n.chips] : [id];
+  const depth = (n.lane==="db" || n.chips.length) ? 1 : 2;
+  const all=new Set([...walk(starts,"out",depth),...walk(starts,"in",depth)]);
+  all.forEach(light); n.el.classList.add("focus");
+  placeLabels(); renderNode(id); panel.scrollTop=0; openPanel();
+}
+function showStep(i){
+  clear(); setStepPressed(i);
+  if(i<0){renderIntro();closePanel();return;}
+  document.body.classList.add("sel");
+  const set=new Set(STEPS[i].n); set.forEach(light);
+  edgeEls.forEach(e=>{if(set.has(e.a)&&set.has(e.b)){e.p.classList.add("on");e.t.classList.add("on");}});
+  placeLabels(); renderStep(i); panel.scrollTop=0; openPanel();
+}
+
+/* ===== 面板 ===== */
+const panel=document.getElementById("panel"), pin=document.getElementById("pin");
+function fullName(id){const n=NODE[id];return n.card?`${NODE[n.card].label}・${n.label}`:n.label;}
+function link(id){return `<button type="button" class="lnk" data-go="${id}">${fullName(id)}</button>`;}
+function imgFor(id){ if(id in IMG) return IMG[id]; const n=NODE[id]; return n.card && (n.card in IMG) ? IMG[n.card] : null; }
+function shotHtml(img,hot){
+  if(!img) return hot&&hot.note?`<div class="hotnote">${hot.note}</div>`:"";
+  const [f,cap,kind]=img;
+  const boxes=(hot&&hot.box||[]).map(b=>`<span class="hb${b[4]?" w":""}" style="left:${b[0]}%;top:${b[1]}%;width:${b[2]}%;height:${b[3]}%"></span>`).join("");
+  const pic=`<span class="hot"><img src="img/${f}" alt="${cap}">${boxes}</span>`;
+  const inner = kind==="phone" ? `<div class="phone">${pic}</div>`
+              : kind==="browser" ? `<div class="browser"><div class="bar"><i></i><i></i><i></i></div>${pic}</div>`
+              : `<div class="wide">${pic}</div>`;
+  let key="";
+  if(hot&&hot.box&&hot.box.length){
+    const hasLoc=hot.box.some(b=>!b[4]), hasW=hot.box.some(b=>b[4]);
+    key=`<div class="hotkey">${hasLoc?`<span><i></i>這個項目在畫面上的位置</span>`:""}${hasW?`<span><i class="w"></i>待修的地方</span>`:""}</div>`;
+  }
+  const note=hot&&hot.note?`<div class="hotnote">${hot.note}</div>`:"";
+  return `<figure class="shot"><button type="button" data-zoom="img/${f}" aria-label="放大截圖">${inner}</button>${key}<figcaption>${cap}　點圖可放大</figcaption>${note}</figure>`;
+}
+function renderNode(id){
+  const n=NODE[id], info=INFO[id]||{}, [kl,kc]=KINDLABEL[n.lane];
+  let h=`<span class="kind ${kc}">${kl}</span><h2>${n.label}</h2>`;
+  if(n.card) h+=`<p class="parent">屬於 ${link(n.card)}</p>`;
+  if(info.issue) h+=`<div class="issue top">${info.issue}</div>`;
+  h+=shotHtml(imgFor(id),HOT[id]);
+  if(info.what) h+=`<h3>是什麼</h3><p>${info.what}</p>`;
+  if(info.fields) h+=`<div class="fields">${info.fields.map(x=>`<span>${x}</span>`).join("")}</div>`;
+  if(info.calc) h+=`<h3>怎麼算</h3><div>${info.calc}</div>`;
+  if(info.freq) h+=`<h3>多久一次</h3><p>${info.freq}</p>`;
+  if(info.store) h+=`<h3>存在哪裡</h3><div>${info.store}</div>`;
+  if(info.show) h+=`<h3>在哪裡看到</h3><div>${info.show}</div>`;
+  const ins=IN[id]||[], outs=OUT[id]||[];
+  if(ins.length) h+=`<h3>從哪裡來</h3><ul class="rel">${ins.map(e=>`<li>${link(e.a)}${e.label?` <span class="lab">（${e.label}）</span>`:""}</li>`).join("")}</ul>`;
+  if(outs.length) h+=`<h3>用在哪裡</h3><ul class="rel">${outs.map(e=>`<li>${link(e.b)}${e.label?` <span class="lab">（${e.label}）</span>`:""}</li>`).join("")}</ul>`;
+  if(n.chips.length) h+=`<h3>包含</h3><ul class="rel">${n.chips.map(c=>`<li>${link(c)}</li>`).join("")}</ul>`;
+  h+=`<p class="navrow"><button type="button" class="lnk" data-step="-1">回到總覽</button></p>`;
+  pin.innerHTML=h;
+}
+function renderStep(i){
+  const s=STEPS[i];
+  const firstCard=s.n.find(id=>NODE[id].lane!=="db"&&!NODE[id].card);
+  let h=`<span class="kind k-db">流程 ${i+1} / ${STEPS.length}</span><h2>${s.t}</h2>`;
+  h+=shotHtml(firstCard?imgFor(firstCard):null);
+  h+=`<p style="margin-top:10px">${s.p}</p><h3>這一步相關的項目</h3><ul class="rel">${s.n.filter(id=>!NODE[id].chips.length).map(id=>`<li>${link(id)}</li>`).join("")}</ul>`;
+  h+=`<p class="navrow">${i>0?`<button type="button" class="lnk" data-step="${i-1}">上一步</button>`:""}${i<STEPS.length-1?`<button type="button" class="lnk" data-step="${i+1}">下一步</button>`:""}<button type="button" class="lnk" data-step="-1">回到總覽</button></p>`;
+  pin.innerHTML=h;
+}
+const ICON={app:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>',
+ db:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/></svg>',
+ adm:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'};
+function renderIntro(){
+  pin.innerHTML=`<span class="kind k-db">怎麼看這張圖</span><h2>三欄、五張表、七個步驟</h2>
+  <div class="introgrid">
+    <div><span class="ic" style="background:var(--app-soft);color:var(--app)">${ICON.app}</span><p><b>左欄 App</b>：受訓者看到的畫面，以及每一步產生的數值（帶圓點的是數值）。</p></div>
+    <div><span class="ic" style="background:var(--db-soft);color:var(--db)">${ICON.db}</span><p><b>中欄 雲端資料</b>：五張資料表。App 與後台都透過它們交換資料，彼此不直接相連。</p></div>
+    <div><span class="ic" style="background:var(--adm-soft);color:var(--adm)">${ICON.adm}</span><p><b>右欄 後台</b>：醫療端輸入設定的地方，以及列表、訓練歷程、季報告、匯出。</p></div>
+  </div>
+  <h3>操作</h3><ul><li>點任一畫面縮圖、標題或數值：亮出來源與去向，並顯示實際畫面、怎麼算、多久一次、在哪裡看到</li><li>點上方流程按鈕：照順序看一次完整流程</li><li>標「待修」「待決」：11/3、11/8 討論中尚未完成的事</li></ul>
+  <h3>從這裡開始</h3><ul class="rel"><li><button type="button" class="lnk" data-step="0">流程 1：後台設定</button></li><li>${link("v_rhr")}</li><li>${link("v_thr")}</li><li>${link("v_points")}</li><li>${link("csv_hrv")}</li></ul>`;
+}
+pin.addEventListener("click",ev=>{
+  const z=ev.target.closest("[data-zoom]"); if(z){lbimg.src=z.dataset.zoom;lb.classList.add("open");return;}
+  const g=ev.target.closest("[data-go]"); if(g){select(g.dataset.go);return;}
+  const s=ev.target.closest("[data-step]"); if(s){showStep(+s.dataset.step);}
+});
+document.getElementById("pclose").addEventListener("click",closePanel);
+document.getElementById("backdrop").addEventListener("click",closePanel);
+const lb=document.getElementById("lightbox"), lbimg=document.getElementById("lbimg");
+lb.addEventListener("click",()=>lb.classList.remove("open"));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(lb.classList.contains("open"))lb.classList.remove("open");else closePanel();}});
+
+/* ===== 流程按鈕 ===== */
+const stepsNav=document.getElementById("steps");
+const allBtn=document.createElement("button"); allBtn.type="button"; allBtn.className="all"; allBtn.textContent="總覽"; allBtn.addEventListener("click",()=>showStep(-1)); stepsNav.appendChild(allBtn);
+STEPS.forEach((s,i)=>{
+  const sep=document.createElement("span"); sep.className="sep"; stepsNav.appendChild(sep);
+  const b=document.createElement("button"); b.type="button"; b.innerHTML=`<span class="n">${i+1}</span>${s.t}`; b.addEventListener("click",()=>showStep(i)); stepsNav.appendChild(b);
+});
+function setStepPressed(i){[...stepsNav.querySelectorAll("button")].forEach((b,k)=>b.setAttribute("aria-pressed",String(k===i+1)));}
+
+/* ===== 待修清單 ===== */
+const issueList=document.getElementById("issueList"); let ic=0;
+const plain=h=>h.replace(/<[^>]+>/g,"").replace(/^(待修|待決)：/,"");
+for(const [lane,id,title,desc,chips] of CARDS) for(const [cid,label,,tag] of chips) if(tag){
+  ic++; const li=document.createElement("li");
+  li.innerHTML=`<span class="tag">${tag}</span>${link(cid)}<span class="sum">${plain(INFO[cid].issue||"")}</span>`; issueList.appendChild(li);
+  NODE[cid].el.title=plain(INFO[cid].issue||"");
+}
+for(const id of ["db_rest","v_rhr","v_nlfhf"]){ ic++; const li=document.createElement("li"); li.innerHTML=`<span class="tag">${id==="v_rhr"?"待決":"待修"}</span>${link(id)}<span class="sum">${plain(INFO[id].issue)}</span>`; issueList.appendChild(li); }
+document.getElementById("issueCount").textContent=ic;
+issueList.addEventListener("click",ev=>{const g=ev.target.closest("[data-go]"); if(g){select(g.dataset.go); if(!narrow()) window.scrollTo({top:0,behavior:"smooth"});}});
+
+renderIntro(); setStepPressed(-1); layout();
+window.addEventListener("resize",layout);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(layout);
+new ResizeObserver(layout).observe(map);
+window.addEventListener("load",layout);
+</script>
+</body>
+</html>
