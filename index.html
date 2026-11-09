@@ -251,6 +251,30 @@ html.is-phone .pclose::before{display:none}
 html.is-phone body{padding-bottom:0}
 html.is-phone .mtools .seg:first-child{display:none}
 html.is-phone .mtools .hint{display:none}
+/* 手機說明面板精簡：截圖縮小靠左、文字排旁邊 */
+html.is-phone .pclose{position:absolute;top:6px;right:6px;padding:0;background:none}
+html.is-phone .pclose button{width:30px;height:30px;font-size:18px}
+html.is-phone .pin{padding:12px 14px 16px;font-size:13px;line-height:1.55}
+html.is-phone .kind{font-size:11px;padding:1px 6px}
+html.is-phone .panel h2{font-size:17px;margin:4px 34px 0 0}
+html.is-phone .panel .parent{font-size:12px}
+html.is-phone .panel p,html.is-phone .panel li,html.is-phone .rel li{font-size:13px;line-height:1.55}
+html.is-phone .panel h3{margin-top:10px;font-size:11.5px}
+html.is-phone .issue{font-size:12.5px;padding:6px 9px;margin-top:8px}
+html.is-phone .f{font-size:11.5px;padding:6px 8px}
+html.is-phone .shot{display:flow-root;margin:8px 0 2px}
+html.is-phone .shot>button{float:left;margin:0 10px 4px 0}
+html.is-phone .shot .phone{width:84px;border-width:3px;border-radius:12px;margin:0;box-shadow:none}
+html.is-phone .shot>button:has(.browser),html.is-phone .shot>button:has(.wide){width:46%}
+html.is-phone .shot .browser,html.is-phone .shot .wide{width:100%;margin:0}
+html.is-phone .shot.noloc>button,html.is-phone .shot.noloc figcaption{display:none}
+html.is-phone .shot .browser .bar{padding:4px 6px}
+html.is-phone .shot .browser .bar i{width:6px;height:6px}
+html.is-phone .shot .wide img{border-radius:8px}
+html.is-phone .shot figcaption,html.is-phone .hotkey,html.is-phone .hotnote{font-size:11.5px;line-height:1.5}
+html.is-phone .hotnote{padding:4px 8px;margin-top:6px}
+html.is-phone .hb{border-width:2px}
+html.is-phone .fields span{font-size:11.5px}
 </style>
 </head>
 <body>
@@ -738,7 +762,8 @@ function shotHtml(img,hot){
     key=`<div class="hotkey">${hasLoc?`<span><i></i>這個項目在畫面上的位置</span>`:""}${hasW?`<span><i class="w"></i>待修的地方</span>`:""}</div>`;
   }
   const note=hot&&hot.note?`<div class="hotnote">${hot.note}</div>`:"";
-  return `<figure class="shot"><button type="button" data-zoom="img/${f}" aria-label="放大截圖">${inner}</button>${key}<figcaption>${cap}　點圖可放大</figcaption>${note}</figure>`;
+  const noloc = hot&&hot.note&&!(hot.box&&hot.box.length);
+  return `<figure class="shot${noloc?" noloc":""}"><button type="button" data-zoom="img/${f}" aria-label="放大截圖">${inner}</button>${key}<figcaption>${cap}　點圖可放大</figcaption>${note}</figure>`;
 }
 function renderNode(id){
   const n=NODE[id], info=INFO[id]||{}, [kl,kc]=KINDLABEL[n.lane];
