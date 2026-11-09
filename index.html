@@ -240,9 +240,22 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
   .stat b{font-size:19px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ── 手機一律橫式：直拿時把整頁轉 90 度；說明面板改右側抽屜 ── */
+html.rot,html.rot body{overflow:hidden;height:100%}
+html.rot #stage{position:fixed;top:0;left:0;width:100vh;height:100vw;width:100dvh;height:100dvw;transform:translateX(100vw) rotate(90deg);transform:translateX(100dvw) rotate(90deg);transform-origin:0 0;overflow:hidden;background:var(--bg)}
+html.rot #scroller{position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+html.is-phone aside.panel{top:0;bottom:0;left:auto;right:0;width:min(400px,58%);height:auto;max-height:none;border-radius:18px 0 0 18px;transform:translateX(105%)}
+html.is-phone body.panel-open aside.panel{transform:none}
+html.is-phone .pclose{justify-content:flex-end;padding-top:10px}
+html.is-phone .pclose::before{display:none}
+html.is-phone body{padding-bottom:0}
+html.is-phone .mtools .seg:first-child{display:none}
+html.is-phone .mtools .hint{display:none}
 </style>
 </head>
 <body>
+<div id="stage">
+<div id="scroller">
 <header class="wrap">
   <span class="eyebrow"><i></i>禾青心訓・資料怎麼流動</span>
   <h1>App 與後台資料關聯圖</h1>
@@ -311,7 +324,9 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
 </section>
 <footer class="wrap">禾青醫電 HEQING MEDICAL・合作院所討論用文件・截圖中的登入碼、生日、姓名已遮蔽</footer>
 
+</div>
 <div class="lightbox" id="lightbox" role="dialog" aria-label="放大檢視"><img id="lbimg" alt=""></div>
+</div>
 
 <script>
 /* ===== 節點 [lane, id, 標題, 說明, chips[[id, 名稱, 是否為數值, 標籤]]] ===== */
@@ -582,11 +597,27 @@ for (const [a,b,type,label] of EDGES){
 }
 function box(id){
   // x 取所屬卡片的左右邊緣（連線不穿過卡片），y 取項目本身的中心
-  const n=NODE[id], r=n.el.getBoundingClientRect(), c=(n.card?NODE[n.card].el:n.el).getBoundingClientRect(), m=map.getBoundingClientRect();
-  return {l:(c.left-m.left)/S,r:(c.right-m.left)/S,cy:((r.top+r.bottom)/2-m.top)/S};
+  // 用 offsetLeft／offsetTop 往上累加到 map，不受整頁旋轉與縮放影響
+  const n=NODE[id], c=n.card?NODE[n.card].el:n.el;
+  const off=el=>{let x=0,y=0;while(el&&el!==map){x+=el.offsetLeft;y+=el.offsetTop;el=el.offsetParent;}return [x,y];};
+  const [cx]=off(c), [,ry]=off(n.el);
+  return {l:cx,r:cx+c.offsetWidth,cy:ry+n.el.offsetHeight/2};
 }
+/* 手機（觸控、長邊 ≤ 1000）：直拿時旋轉成橫式，畫面一律等同電腦版 */
+const isPhone=()=>window.matchMedia("(pointer:coarse)").matches && Math.max(innerWidth,innerHeight)<=1000;
+function applyOrientation(){
+  const phone=isPhone(), portrait=innerHeight>innerWidth, rot=phone&&portrait;
+  document.documentElement.classList.toggle("is-phone",phone);
+  document.documentElement.classList.toggle("rot",rot);
+  // 旋轉時說明面板與遮罩要放在捲動層外面，才不會跟著頁面捲走
+  const stage=document.getElementById("stage"), pnl=document.getElementById("panel"), bd=document.getElementById("backdrop");
+  if(rot){ stage.appendChild(bd); stage.appendChild(pnl); }
+  else if(pnl.parentElement===stage){ document.querySelector(".layout").appendChild(pnl); document.querySelector(".layout").after(bd); }
+}
+applyOrientation();
+const scroller=()=>document.documentElement.classList.contains("rot")?document.getElementById("scroller"):window;
 const isNarrow=()=>window.matchMedia("(max-width:900px)").matches;
-let viewMode="map", zoomLevel="fit", S=1;
+let viewMode="map", zoomLevel="fit", S=1;  // 手機一律關係圖模式
 const narrow=()=>isNarrow()&&viewMode==="list";   // 清單模式：不畫連線
 function applyView(){
   const mapMode=isNarrow()&&viewMode==="map";
@@ -780,10 +811,11 @@ for(const [lane,id,title,desc,chips] of CARDS) for(const [cid,label,,tag] of chi
 }
 for(const id of ["db_rest","v_rhr","v_nlfhf"]){ ic++; const li=document.createElement("li"); li.innerHTML=`<span class="tag">${id==="v_rhr"?"待決":"待修"}</span>${link(id)}<span class="sum">${plain(INFO[id].issue)}</span>`; issueList.appendChild(li); }
 document.getElementById("issueCount").textContent=ic;
-issueList.addEventListener("click",ev=>{const g=ev.target.closest("[data-go]"); if(g){select(g.dataset.go); if(!narrow()) window.scrollTo({top:0,behavior:"smooth"});}});
+issueList.addEventListener("click",ev=>{const g=ev.target.closest("[data-go]"); if(g){select(g.dataset.go); if(!narrow()) scroller().scrollTo({top:0,behavior:"smooth"});}});
 
 renderIntro(); setStepPressed(-1); applyView();
-window.addEventListener("resize",applyView);
+window.addEventListener("resize",()=>{applyOrientation();applyView();});
+window.addEventListener("orientationchange",()=>setTimeout(()=>{applyOrientation();applyView();},250));
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(applyView);
 new ResizeObserver(()=>applyView()).observe(map);
 window.addEventListener("load",applyView);
