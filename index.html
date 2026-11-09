@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>禾青心訓資料關聯圖</title>
+<script>
+/* 在 LINE 內建瀏覽器開啟時，自動改用手機預設瀏覽器（LINE 支援 openExternalBrowser=1） */
+(function(){try{
+  if(/Line\//i.test(navigator.userAgent) && !/[?&]openExternalBrowser=1/.test(location.search)){
+    var u=new URL(location.href); u.searchParams.set("openExternalBrowser","1"); location.replace(u.toString());
+  }
+}catch(e){}})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">

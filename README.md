@@ -6,7 +6,9 @@
 
 直接開啟網頁版（GitHub Pages）：
 
-**https://jdc730214.github.io/hohofit-dataflow-e5e157/**
+**https://jdc730214.github.io/hohofit-dataflow-e5e157/?openExternalBrowser=1**
+
+用 LINE 傳送請用上面這個網址，點開會直接改用手機的瀏覽器（Chrome 或 Safari），畫面比 LINE 內建瀏覽器正常。手機直拿時畫面會自動轉成橫式，請把手機轉橫來看。
 
 - 點任何一個畫面縮圖、標題或數值，會亮出它的來源與去向，右側顯示實際截圖與說明
 - 截圖上的青色閃爍框標示該項目的位置，琥珀色框標示待修的地方
